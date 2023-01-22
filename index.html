@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./style.css" rel="stylesheet" />
+    <title>Cahier de texte virtuel</title>
+</head>
+<body>
+    <h1>Bienvenue sur votre
+        <br>
+        cahier de texte virtuel !
+    </h1>
+
+    
+
+<button id="open-form-btn" onclick="openForm()">Ajouter un devoir</button>
+<div id="form-overlay">
+    <div id="form-popup">
+        <form id="myForm">
+            <h1>Ajouter un devoir</h1>
+            <label for="titre">Titre :</label>
+            <input type="text" name="titre">
+            <br>
+            <label for="matiere">Matière :</label>
+            <input type="text" name="matiere">
+            <br>
+            <label for="titre">Date de rendu :</label>
+            <input type="date" name="due-date-input">
+            <br>
+            <label for="desc">Description :</label>
+            <textarea name="description"></textarea>
+            <br>
+            <button id="submit-btn" type="submit" onclick="closeForm()">Ajouter</button>
+            <button id="close-btn" onclick="closeForm()">Fermer</button>
+        </form>
+    </div>
+</div>
+<div id="result"></div>
+
+   
+
+    <h2>Mes devoirs</h2>
+    <div>
+        <div class="row" id="header">
+            <p>Titre</p>
+            <p>Matière</p>
+            <p>Description</p>
+            <p>Date de création</p>
+            <p>Date de rendu</p>
+            <div></div>
+        </div>
+        <div id="list-body">
+        </div>
+    </div>
+</body>
+<script>
+    const myForm = document.querySelector("#myForm")
+    const listBody = document.querySelector("#list-body")
+    const todos = []
+
+
+    const generateTodo = (todo) => `
+        <p>${todo.titre}</p>
+        <p>${todo.matiere}</p>
+        <p>${todo.description}</p>
+        <p>${todo.dateDeCreation.toLocaleString()}</p>
+        <p>${todo.dateDeTraitement ? todo.dateDeTraitement.toLocaleString() : ""}</p>
+        <div>
+            <button onclick="endTodo(${todo.id})">Traité</button>
+            <button onclick="deleteTodo(${todo.id})">Supprimer</button>
+        </div>`
+    
+    myForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+
+        const todo = {
+            titre: formData.get("titre"),
+            matiere: formData.get("matiere"),
+            description: formData.get("description"),
+            dateDeCreation: new Date(),
+            dateDeTraitement: null,
+            id: todos.length > 0 ? todos[todos.length - 1].id + 1 : 0
+        }
+
+        todos.push(todo)
+
+        listBody.innerHTML = listBody.innerHTML + `<div class="row" id="todo-${todo.id}">${generateTodo(todo)}</div>`
+
+
+    })
+
+
+    function endTodo(todoId) {
+        const index = todos.findIndex(todo => todo.id == todoId)
+
+    if (index > -1) {
+        todos[index].dateDeTraitement = new Date()
+        const todoLine = document.querySelector("#todo-" + todoId).innerHTML = generateTodo(todos[index])
+    }
+}
+
+function deleteTodo(todoId) {
+    const index = todos.findIndex(todo => todo.id == todoId)
+
+    if (index > -1) {
+        todos.splice(index, 1)
+        document.getElementById("todo-" + todoId).remove()
+    }
+}
+
+function openForm() {
+    document.getElementById("form-overlay").style.display = "block";
+}
+function closeForm() {
+    document.getElementById("form-overlay").style.display = "none";
+}
+
+
+</script>
+</html>
